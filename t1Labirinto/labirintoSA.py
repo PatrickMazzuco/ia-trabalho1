@@ -72,21 +72,22 @@ def calcular_caminho(caminho, print_caminho=False):
 
             if caminho_andado[pos_vert_atual][pos_hor_atual] == step:
                 repet += 1
-                pontos -= (1 + repet * 2)
+                pontos -= 2
             else:
                 caminho_andado[pos_vert_atual][pos_hor_atual] = step
             if pos_lab == '0' or pos_lab == 'E':
                 corretos += 1
-                pontos += 1 + corretos * 2
+                pontos += 1
             elif pos_lab == '1':
-                pontos -= 20
+                pontos -= 50
                 break
             elif pos_lab == 'S':
                 pontos += espacos_livre * 2
                 caminho_andado[pos_vert_atual][pos_hor_atual] = 'S'
                 break
         else:
-            return 0
+            pontos -= 200
+            break
     _ = print_matriz(caminho_andado) if print_caminho else False
     return pontos
 
@@ -97,9 +98,9 @@ def mudar_caminho(caminho):
 
 
 def simulated_annealing():
-    temp_incial = 1000
+    temp_incial = 10000
     temp = temp_incial
-    escal = 0.95
+    escal = 0.90
     caminho = get_caminho_aleatorio()
     valor_atual = calcular_caminho(caminho)
 
@@ -148,7 +149,7 @@ def esta_correto(caminho):
 
 
 resultado = simulated_annealing()
-print(resultado)
-print(esta_correto(resultado))
-print(a)
+print("Exemplo correto:\n", a)
+print("Resultado encontrado:\n", resultado)
+print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
 calcular_caminho(resultado, True)
