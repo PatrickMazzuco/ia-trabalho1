@@ -1,5 +1,5 @@
 import random
-
+import sys
 
 def ler_arquivo(caminho):
     """
@@ -48,7 +48,7 @@ def calcular_caminho(caminho, print_caminho=False):
     caminho_andado = [[0 for _ in range(0, tamanho_labirinto)] for _ in range(0, tamanho_labirinto)]
     pos_vert_atual = posicao_inicial[0]
     pos_hor_atual = posicao_inicial[1]
-    step = '#'
+    step = '.'
     caminho_andado[pos_vert_atual][pos_hor_atual] = step
     pontos = 0
     corretos = 0
@@ -88,7 +88,7 @@ def calcular_caminho(caminho, print_caminho=False):
             pontos -= 2
             # break
 
-    _ = (print_matriz(caminho_andado), print((pos_vert_atual, pos_hor_atual))) if print_caminho else False
+    _ = (print_matriz(caminho_andado)) if print_caminho else False
     # print(pontos)
     return pontos
 
@@ -275,26 +275,26 @@ labirinto_ = [['E', '1', '1', '1', '1', '1', '1', '1', '0', '1'],
 
 # Main
 
+if __name__ == '__main__':
+    labirinto = ler_arquivo(sys.argv[1])
+    espacos_livre = 1
+    tamanho_labirinto = len(labirinto[0])
+    posicao_inicial = -1
+    a = ['B', 'D', 'D', 'D', 'B', 'B', 'B', 'B', 'E', 'E', 'E', 'B', 'B', 'B', 'B', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
+         'C',
+         'C', 'E', 'C', 'C', 'D', 'D', 'D', 'B']
+    for i in range(0, tamanho_labirinto):
+        for j in range(0, tamanho_labirinto):
+            if labirinto[i][j] == '0':
+                espacos_livre += 1
+            elif labirinto[i][j] == 'E':
+                posicao_inicial = (i, j)
+    espacos_livre = tamanho_labirinto ** 2
+    direcoes = ('C', 'B', 'E', 'D')
 
-labirinto = ler_arquivo('./labirintos/labirintoE.txt')
-espacos_livre = 1
-tamanho_labirinto = len(labirinto[0])
-posicao_inicial = -1
-a = ['B', 'D', 'D', 'D', 'B', 'B', 'B', 'B', 'E', 'E', 'E', 'B', 'B', 'B', 'B', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'C',
-     'C', 'E', 'C', 'C', 'D', 'D', 'D', 'B']
-for i in range(0, tamanho_labirinto):
-    for j in range(0, tamanho_labirinto):
-        if labirinto[i][j] == '0':
-            espacos_livre += 1
-        elif labirinto[i][j] == 'E':
-            posicao_inicial = (i, j)
-espacos_livre = tamanho_labirinto ** 2
-direcoes = ('C', 'B', 'E', 'D')
+    resultado = alg_genetico(100, 1000)
 
-resultado = alg_genetico(100, 1000)
-
-print("Exemplo correto:\n", a)
-print("Resultado encontrado:\n", resultado)
-print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
-calcular_caminho(resultado, True)
-print(posicao_inicial)
+    # print("Exemplo correto:\n", a)
+    print("Resultado encontrado:\n", resultado)
+    print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
+    calcular_caminho(resultado, True)

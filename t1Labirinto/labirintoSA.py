@@ -1,4 +1,5 @@
 from math import exp
+import sys
 import random
 
 
@@ -49,7 +50,7 @@ def calcular_caminho(caminho, print_caminho=False):
     caminho_andado = [[0 for _ in range(0, tamanho_labirinto)] for _ in range(0, tamanho_labirinto)]
     pos_vert_atual = posicao_inicial[0]
     pos_hor_atual = posicao_inicial[1]
-    step = '#'
+    step = '.'
     caminho_andado[pos_vert_atual][pos_hor_atual] = step
     pontos = 0
     corretos = 0
@@ -90,7 +91,7 @@ def calcular_caminho(caminho, print_caminho=False):
             pontos -= 2
             break
 
-    _ = (print_matriz(caminho_andado), print((pos_vert_atual, pos_hor_atual))) if print_caminho else False
+    _ = (print_matriz(caminho_andado)) if print_caminho else False
     # print(pontos)
     return pontos
 
@@ -133,7 +134,7 @@ def simulated_annealing():
             valor_atual = valor_prox
         if esta_correto(caminho):
             return caminho
-    print(valor_atual)
+    # print(valor_atual)
     return caminho
 
 
@@ -165,7 +166,7 @@ def simulated_annealing_ref(caminho):
             valor_atual = valor_prox
         if esta_correto(caminho):
             return caminho
-    print(valor_atual)
+    # print(valor_atual)
     return caminho
 
 
@@ -233,9 +234,9 @@ def avaliar_caminho(caminho):
 
 # labirinto de exemplo
 
-labirinto_exemplo_ = [['E', '0', '0', 'S'],
-                      ['0', '0', '1', '0'],
-                      ['0', '0', '1', '0'],
+labirinto_exemplo_ = [['E', '1', '1', 'S'],
+                      ['0', '1', '1', '0'],
+                      ['0', '1', '1', '0'],
                       ['0', '0', '0', '0']]
 
 labirinto_exemplo = [['E', '1', '1', '1', '1', '1', '1', '1', '0', '1'],
@@ -251,28 +252,31 @@ labirinto_exemplo = [['E', '1', '1', '1', '1', '1', '1', '1', '0', '1'],
 
 # Main
 
-labirinto = ler_arquivo('./labirintos/labirintoE.txt')
-espacos_livre = 1
-tamanho_labirinto = len(labirinto[0])
-posicao_inicial = -1
-a = ['B', 'D', 'D', 'D', 'B', 'B', 'B', 'B', 'E', 'E', 'E', 'B', 'B', 'B', 'B', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'C',
-     'C', 'E', 'C', 'C', 'D', 'D', 'D', 'B']
-for i in range(0, tamanho_labirinto):
-    for j in range(0, tamanho_labirinto):
-        if labirinto_exemplo[i][j] == '0':
-            espacos_livre += 1
-        elif labirinto_exemplo[i][j] == 'E':
-            posicao_inicial = (i, j)
-direcoes = ('C', 'B', 'E', 'D')
+if __name__ == '__main__':
+    labirinto = ler_arquivo(sys.argv[1])
+    espacos_livre = 1
+    tamanho_labirinto = len(labirinto[0])
+    posicao_inicial = -1
+    a = ['B', 'D', 'D', 'D', 'B', 'B', 'B', 'B', 'E', 'E', 'E', 'B', 'B', 'B', 'B', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
+         'C',
+         'C', 'E', 'C', 'C', 'D', 'D', 'D', 'B']
+    for i in range(0, tamanho_labirinto):
+        for j in range(0, tamanho_labirinto):
+            if labirinto_exemplo[i][j] == '0':
+                espacos_livre += 1
+            elif labirinto_exemplo[i][j] == 'E':
+                posicao_inicial = (i, j)
+    direcoes = ('C', 'B', 'E', 'D')
 
+    resultado = simulated_annealing()
 
-resultado = simulated_annealing()
-print("Exemplo correto:\n", a)
-print("Resultado encontrado:\n", resultado)
-print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
-calcular_caminho(resultado, True)
-resultado = simulated_annealing_ref(resultado)
-resultado = simulated_annealing_ref(resultado)
-print("Resultado encontrado:\n", resultado)
-print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
-calcular_caminho(resultado, True)
+    # print("Exemplo correto:\n", a)
+
+    print("Resultado encontrado:\n", resultado)
+    print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
+    calcular_caminho(resultado, True)
+    resultado = simulated_annealing_ref(resultado)
+    resultado = simulated_annealing_ref(resultado)
+    print("Resultado encontrado após refinar:\n", resultado)
+    print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
+    calcular_caminho(resultado, True)
