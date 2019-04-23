@@ -73,9 +73,10 @@ def calcular_caminho(caminho, print_caminho=False):
             else:
                 caminho_andado[pos_vert_atual][pos_hor_atual] = step
             if pos_lab == '0' or pos_lab == 'E':
-                corretos += 1
+                corretos += 1 + corretos
                 pontos += 1
             elif pos_lab == '1':
+                corretos = 0
                 pontos -= 2
                 # break
 
@@ -86,6 +87,7 @@ def calcular_caminho(caminho, print_caminho=False):
 
         else:
             pontos -= 2
+            corretos = 0
             # break
 
     _ = (print_matriz(caminho_andado)) if print_caminho else False
@@ -125,10 +127,12 @@ def esta_correto(caminho):
 
         if 0 <= pos_hor_atual < tamanho_labirinto and 0 <= pos_vert_atual < tamanho_labirinto:
             pos_lab = labirinto[pos_vert_atual][pos_hor_atual]
-
             if pos_lab == '1':
                 return False
             elif pos_lab == 'S':
+                print_matriz(mapear_caminho(caminho))
+                print()
+                gerar_html()
                 return True
         else:
             return False
@@ -180,6 +184,7 @@ def selecao(populacao, avaliacao):
         elif avaliacao[i] > melhor[0]:
             melhor = avaliacao[i], i
     melhor = populacao[melhor[1]]
+    html_output.append(lab_to_html(melhor))
     pop_intermed.append(melhor)
     pop_intermed.append(get_caminho_aleatorio())
     pai = populacao[rnd(avaliacao)]
@@ -255,6 +260,85 @@ def alg_genetico(tam_pop, geracoes):
     return new_pop[melhor[1]]
 
 
+def mapear_caminho(caminho):
+    new_lab = [L[:] for L in labirinto]
+    pos_vert_atual = posicao_inicial[0]
+    pos_hor_atual = posicao_inicial[1]
+
+    for dir in caminho:
+        if dir == 'C':
+            pos_vert_atual -= 1
+        elif dir == 'B':
+            pos_vert_atual += 1
+        elif dir == 'D':
+            pos_hor_atual += 1
+        elif dir == 'E':
+            pos_hor_atual -= 1
+
+        if 0 <= pos_hor_atual < tamanho_labirinto and 0 <= pos_vert_atual < tamanho_labirinto:
+            pos_lab = labirinto[pos_vert_atual][pos_hor_atual]
+
+            if pos_lab == '1':
+                new_lab[pos_vert_atual][pos_hor_atual] = '#'
+            elif pos_lab == 'S':
+                break
+            elif pos_lab == '0':
+                new_lab[pos_vert_atual][pos_hor_atual] = 'X'
+        else:
+            break
+    return new_lab
+
+
+def lab_to_html(caminho):
+    new_lab = mapear_caminho(caminho)
+    out = '<table style="border: 1px solid black">\n'
+    out += '<p>' + str(caminho) + '</p>'
+    for linha in new_lab:
+        out += '\t<tr>\n'
+        for pos in linha:
+            if pos == '#':
+                out += '\t\t<th style="background-color: orange"></th>\n'
+            elif pos == 'E':
+                out += '\t\t<th style="background-color: yellow">E</th>\n'
+            elif pos == 'S':
+                out += '\t\t<th style="background-color: red">S</th>\n'
+            elif pos == '0':
+                out += '\t\t<th style="background-color: white"></th>\n'
+            elif pos == 'X':
+                out += '\t\t<th style="color: white">X</th>\n'
+            else:
+                out += '\t\t<th></th>\n'
+        out += '\t<tr>\n'
+    out += '</table>\n<br>\n'
+    return out
+
+
+def gerar_html():
+    arq = open("simulacao.html", "w")
+    writ = []
+    writ.append('<!DOCTYPE html>\n'
+                '<html>\n'
+                '<style>\n\t'
+                'th {\n\t\t'
+                'width: 20px;\n\t\t'
+                'height: 20px;\n\t\t'
+                'background-color: black;\n\t\t'
+                'color: black;\n\t'
+                '}\n'
+                '</style>\n'
+                '<body>\n'
+                '<h2>Simulacao do algoritmo</h2>\n')
+
+    for lab in html_output:
+        writ.append(lab)
+    writ.append('</body>\n</html>')
+    arq.writelines(writ)
+    arq.close()
+
+
+html_output = []
+
+
 # Labirintos de exemplo
 
 labirinto__ = [['E', '1', '1', 'S'],
@@ -289,12 +373,11 @@ if __name__ == '__main__':
                 espacos_livre += 1
             elif labirinto[i][j] == 'E':
                 posicao_inicial = (i, j)
-    espacos_livre = tamanho_labirinto ** 2
     direcoes = ('C', 'B', 'E', 'D')
 
     resultado = alg_genetico(100, 1000)
 
     # print("Exemplo correto:\n", a)
     print("Resultado encontrado:\n", resultado)
-    print("Esta correto? ", esta_correto(resultado), "\nCaminho percorrido:")
-    calcular_caminho(resultado, True)
+    print("Esta correto? ", esta_correto(resultado))
+    gerar_html()
